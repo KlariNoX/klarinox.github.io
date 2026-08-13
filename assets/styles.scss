@@ -1,0 +1,10 @@
+---
+title: false # Keeps this file out of the navbar, which is built from site.pages
+---
+
+// Overrides the theme's own assets/styles.scss so we can append our styles to
+// it. `garth` is the theme's entry point; ours go after it so they can use the
+// theme's variables and win on source order.
+
+@import "garth";
+@import "toc";

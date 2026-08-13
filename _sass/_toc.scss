@@ -1,0 +1,98 @@
+// "On this page" sidebar for CTF writeups.
+//
+// The theme already turns `.main` into a flex row, so the sidebar needs no
+// layout scaffolding of its own — just a width, and sticky positioning once
+// there is room for two columns. Colours come from the theme's _colors.scss.
+
+$tocWidth: 13rem;
+$tocGutter: 2.5rem;
+$tocBreakpoint: 50em; // Below this the sidebar sits above the writeup instead
+
+// Writeups get a wider container than the rest of the site, because the
+// sidebar would otherwise eat into the theme's 900px reading column.
+.container--wide {
+  max-width: 1200px;
+}
+
+// Stay stacked until $tocBreakpoint, overriding the theme's 40em row.
+.main--writeup {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.toc {
+  margin-bottom: 1.6rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba($bodyColour, 0.15);
+  line-height: 1.5;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $captionColour;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  // Challenges, nested under their category
+  ul ul {
+    margin-bottom: 0.6rem;
+    padding-left: 0.85rem;
+  }
+
+  a {
+    display: block;
+    padding: 0.15rem 0;
+    font-size: 0.85rem;
+    color: $captionColour;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      color: $hoverColour;
+    }
+
+    &.is-active {
+      color: $linkColour;
+    }
+  }
+
+  &__category > a {
+    margin-top: 0.6rem;
+    font-weight: 700;
+  }
+}
+
+@media screen and (min-width: $tocBreakpoint) {
+  .main--writeup {
+    flex-direction: row;
+    align-items: flex-start; // Required for `position: sticky` to have room to move
+    justify-content: flex-start;
+  }
+
+  .main--writeup .article {
+    flex: 1 1 auto;
+    min-width: 0; // Stops wide code blocks from pushing the sidebar off-screen
+  }
+
+  .toc {
+    flex: 0 0 $tocWidth;
+    position: sticky;
+    top: 1rem;
+    margin-top: 1rem;      // <-- keeps the same gap before it starts sticking
+    max-height: calc(100vh - 2rem);
+    margin-right: $tocGutter;
+    overflow-y: auto;
+  }
+}

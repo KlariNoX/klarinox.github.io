@@ -1,7 +1,6 @@
 ---
-layout: post
-title: "Hello World"
-date: 2026-08-10
+title: Hello World!
+category: General
 ---
 
-Hello world. This is the first post. Still figuring out things. I am getting there :P
+Hello world! This is the first post. Still figuring out things. I am getting there :P
