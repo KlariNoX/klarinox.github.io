@@ -75,11 +75,114 @@ One may notice that that the ciphertext has length of 115. That's quite unusual 
 Then, using any online tool to decrypt the cipher will give you the correct flag, `ScriptCTF{NOTWHATITSEEMS}`
 
 ### Misdirection Again (222 Solves, 422 Points)
-TODO
 
+#### Description
+Simpler, yet harder
+
+#### Solution
+Just like Misdirection, we are again given a file `enc.txt` which contains a binary string.
+```
+111101001000111101110000101110000110000111100000010011011111000110001010000100011101001101000101000101011001001101010110110011000110111011011101011100001111010001010110111000110111000110101001111010011110011011010100111101100101000010110010001111011010011101101101001010100101
+```
+
+This time however, cyberchef (and other similar tools I tried) were not able to identify/decipher the ciphertext...
+
+Given that the description mentions that this time the situation is "simpler", with a bit of a guessing power, one might try to treat the ciphertext as a single binary number, and convert it to decimal.
+
+By doing that, we get:
+
+```
+115991141051121166784701231094911510049114519911649481109510249110521089598485353125
+```
+
+Now, this may look like a dead end, but if you happen to be familiar with ascii, you might see that by splitting the text into ascii values you get text!
+
+```
+115 -> s
+99 -> c
+114 -> r
+...
+```
+
+We keep doing that, and the plaintext is revealed.
+
+flag: `scriptCTF{m1sd1r3ct10n_f1n4l_b055}`
 
 ### Oops (190 Solves, 443 Points)
-TODO
+
+#### Description
+I am from the future! I accidentally forgot to link `chall.zip`! Surely you can find it and solve it right?
+
+#### Solution
+Now, as the description suggests, there is no attachment for this challenge. Well, there is one, but the author forgot to include it.
+
+So we are gonna have to get it ourselves.
+
+By looking at the link for any other attachment of any other file, we can see that the format is:
+
+```
+https://scriptctf-2026-wave1-randomchars-4f7d3a6b.s3.us-east-1.amazonaws.com/[Category]/[Challenge]/[file]
+```
+
+So, we try to find the forgotten `chall.zip`.
+
+We visit https://scriptctf-2026-wave1-randomchars-4f7d3a6b.s3.us-east-1.amazonaws.com/Crypto/Oops/chall.zip
+
+and we get the file!
+
+We now unzip it, and we have our ciphertext:
+
+```
+d37cbce47f0c71a75d644badb77039e48ab1645f60ddebe928c0a3c417561345b4852636ecb388ec79417357100da120
+```
+
+and the file that produced it.
+
+```py
+import random
+import time
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from hashlib import sha256
+
+flag = open('flag.txt','rb').read()
+random.seed(int(time.time())) # Preserves upto the MINUTE, not seconds ;)
+key = random.randbytes(32)
+cipher = AES.new(key, AES.MODE_ECB)
+enc = cipher.encrypt(pad(flag,16)).hex()
+open('enc.txt', 'w').write(enc)
+```
+
+Obviously, the seed will be easy to bruteforce since the sub-second precision has been dropped.
+
+We need to check the file creation date before bruteforcing, as we can get that up to the minute, and then we can bruteforce the seconds
+
+By checking file creation date, we see that it was made in 30 November 2069 at 11:39:00 UTC. (Which may seem odd, but hey, the author claimed to be from the future, so we run with it)
+
+By using any online tool, we get that this is 3153037140 in Unix Epoch time.
+
+We are now ready to brute force the seed and get the flag. Here is a simple script that will do the job
+
+```py
+import random
+from Crypto.Cipher import AES
+
+enc = open('enc.txt', 'r').read()
+guess_time = 3153037140 # Known creation date up to the minute
+
+# For each possible second of that minute generate a seed, then a key using that seed.
+# Then using that key, try to decrypt our ciphertext. If we get a hit, great, we print it. If not, move on the the next second.
+for i in range(guess_time, guess_time + 60):
+    random.seed(i)
+    key = random.randbytes(32)
+    cipher = AES.new(key, AES.MODE_ECB)
+    flag = cipher.decrypt(bytes.fromhex(enc))
+    if flag.startswith(b'scriptCTF{'):
+        print(flag.decode("utf-8"))
+```
+
+Running this will instantly reveal the flag: `scriptCTF{mY_buck37_1s_l34k1ng!}`
+Which is a nice reference to how we obtained the challenge files to begin with :)
 
 ## Forensics
 
@@ -111,6 +214,7 @@ TODO
 ## Geo-OSINT
 
 ### Midnight Snack (274 Solves, 381 Points)
+TODO
 
 ### Titan (192 Solves, 442 Points)
 TODO
