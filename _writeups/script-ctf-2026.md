@@ -192,11 +192,11 @@ TODO
 ### John Cena (154 Solves, 463 Points)
 This was a super guessy imo, but the techniques and ideas used are common on image based forensics challenges. If this looks strange and guessy, imo it's because it is... 
 
-### Description 
+#### Description 
 You can't see me!
 
-### Solution
-We are simply given an image file of John Cena, `enc.png`.
+#### Solution
+We are given an image file of John Cena, `enc.png`.
 
 Opening the image, we can see that it's just a regular photo without anything unusual or out of the ordinary.
 
@@ -273,7 +273,13 @@ flag: `scriptCTF{y0u_c4nt_s33_m3_unl355_y0u_s33_m3???}`
 TODO
 
 ### Ron (71 Solves, 500 Points)
-TODO
+
+#### Description
+The password is his name
+
+#### Solution
+We are given an image file of the Harry Potter logo
+
 
 ## Web
 
