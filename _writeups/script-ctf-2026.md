@@ -190,7 +190,84 @@ Which is a nice reference to how we obtained the challenge files to begin with :
 TODO
 
 ### John Cena (154 Solves, 463 Points)
-TODO
+This was a super guessy imo, but the techniques and ideas used are common on image based forensics challenges. If this looks strange and guessy, imo it's because it is... 
+
+### Description 
+You can't see me!
+
+### Solution
+We are simply given an image file of John Cena, `enc.png`.
+
+Opening the image, we can see that it's just a regular photo without anything unusual or out of the ordinary.
+
+!["Image of John Cena given"](/assets/writeups/scriptctf2026/john-cena.png "John Cena Image")
+
+Now, there are many many things to try when given an image in a forensics challenge, but in this case, since this is a public image, one idea would be to compare it to the original, just to see what's different. (if anything)
+
+By reverse image searching, we can find the photo on wikimedia (wikipedia). It is a photo taken By Gage Skidmore of John Cena speaking at the 2025 San Diego Comic-Con International in San Diego, California.
+
+we download the image, the small version of it, which is the version we have from the challenge, and convert it to png. Now we are ready to analyze for differences.
+
+By writing some python code, we analyze for differences in the pixel data, and their locations:
+
+```py
+from PIL import Image
+
+original = Image.open('original.png')
+enc = Image.open('enc.png')
+
+width, height = original.size
+
+original_pixels = list(original.getdata())
+enc_pixels = list(enc.getdata())
+
+changed_positions = []
+
+for i in range(len(original_pixels)):
+    if original_pixels[i] != enc_pixels[i]:
+        x = i % width
+        y = i // width
+        changed_positions.append((x, y))
+
+print("Changed pixels:", changed_positions[:])
+```
+
+We run this, and we have the following output:
+
+```
+Changed pixels: [(0, 1), (0, 2), (0, 3), (0, 6), (0, 7), (0, 9), (0, 10), (0, 14), (0, 15), (0, 17), (0, 18), (0, 19), (0, 22), (0, 25), (0, 26), (0, 28), (0, 31), (0, 33), (0, 34), (0, 35), (0, 41), (0, 42), (0, 43), (0, 45), (0, 49), (0, 54), (0, 55), (0, 57), (0, 59), (0, 61), (0, 65), (0, 69), (0, 70), (0, 73), (0, 74), (0, 75), (0, 76), (0, 78), (0, 79), (0, 81), (0, 82), (0, 83), (0, 84), (0, 87), (0, 90), (0, 91), (0, 97), (0, 98), (0, 99), (0, 101), (0, 103), (0, 105), (0, 107), (0, 108), (0, 109), (0, 110), (0, 111), (0, 113), (0, 114), (0, 118), (0, 119), (0, 122), (0, 123), (0, 125), (0, 129), (0, 130), (0, 132), (0, 133), (0, 134), (0, 137), (0, 138), (0, 139), (0, 141), (0, 145), (0, 147), (0, 148), (0, 149), (0, 150), (0, 151), (0, 153), (0, 154), (0, 155), (0, 158), (0, 159), (0, 162), (0, 163), (0, 166), (0, 167), (0, 170), (0, 171), (0, 174), (0, 175), (0, 177), (0, 179), (0, 180), (0, 181), (0, 182), (0, 183), (0, 185), (0, 186), (0, 188), (0, 189), (0, 191), (0, 194), (0, 195), (0, 198), (0, 199), (0, 201), (0, 203), (0, 204), (0, 205), (0, 206), (0, 207), (0, 209), (0, 210), (0, 211), (0, 213), (0, 215), (0, 217), (0, 218), (0, 220), (0, 221), (0, 222), (0, 225), (0, 226), (0, 228), (0, 229), (0, 234), (0, 235), (0, 238), (0, 239), (0, 242), (0, 243), (0, 245), (0, 247), (0, 250), (0, 251), (0, 253), (0, 255), (0, 257), (0, 259), (0, 260), (0, 261), (0, 262), (0, 263), (0, 265), (0, 266), (0, 267), (0, 268), (0, 271), (0, 274), (0, 275), (0, 281), (0, 282), (0, 283), (0, 285), (0, 287), (0, 289), (0, 291), (0, 292), (0, 293), (0, 294), (0, 295), (0, 297), (0, 298), (0, 299), (0, 302), (0, 303), (0, 306), (0, 307), (0, 310), (0, 311), (0, 314), (0, 315), (0, 318), (0, 319), (0, 321), (0, 323), (0, 324), (0, 325), (0, 326), (0, 327), (0, 329), (0, 330), (0, 332), (0, 333), (0, 335), (0, 338), (0, 339), (0, 342), (0, 343), (0, 346), (0, 347), (0, 348), (0, 349), (0, 350), (0, 351), (0, 354), (0, 355), (0, 356), (0, 357), (0, 358), (0, 359), (0, 362), (0, 363), (0, 364), (0, 365), (0, 366), (0, 367), (0, 369), (0, 370), (0, 371), (0, 372), (0, 373), (0, 375)]
+```
+
+We can see that the changes only happen in the first column!. So, we are gonna treat different pixel value as 1, and same value as 0. We can again write a simple script for this:
+
+```py
+from PIL import Image
+
+original = Image.open('original.png')
+enc = Image.open('enc.png')
+
+width, height = original.size
+
+original_pixels = list(original.getdata())
+enc_pixels = list(enc.getdata())
+
+bits = []
+
+for row in range(height):
+    i = row * width
+    if original_pixels[i] != enc_pixels[i]:
+        bits.append('1')
+    else:
+        bits.append('0')
+
+flag_bin = "".join(bits)
+print("".join(flag_bin))
+```
+
+That produces a binary string. We convert it to ascii, and we get the flag. 
+
+flag: `scriptCTF{y0u_c4nt_s33_m3_unl355_y0u_s33_m3???}`
+
 
 ### RecoverMyPet (125 Solves, 476 Points)
 TODO
