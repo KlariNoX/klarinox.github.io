@@ -56,6 +56,44 @@
   sidebar.querySelector(".toc__nav").appendChild(list);
   sidebar.hidden = false;
 
+  // Below $tocBreakpoint the list is a popover opened by a floating button.
+  // On wider screens the button is hidden and `is-open` has no effect.
+  var toggle = sidebar.querySelector("[data-toc-toggle]");
+  if (toggle) {
+    setUpPopover(toggle);
+  }
+
+  function setUpPopover(button) {
+    function setOpen(open) {
+      sidebar.classList.toggle("is-open", open);
+      button.setAttribute("aria-expanded", String(open));
+    }
+
+    button.addEventListener("click", function () {
+      setOpen(!sidebar.classList.contains("is-open"));
+    });
+
+    // Dismiss on tap outside, including on the backdrop — which is a pseudo
+    // element of the sidebar, so it reports the sidebar itself as the target.
+    document.addEventListener("click", function (event) {
+      if (!sidebar.contains(event.target) || event.target === sidebar) {
+        setOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && sidebar.classList.contains("is-open")) {
+        setOpen(false);
+        button.focus();
+      }
+    });
+
+    // Closing on link tap gets the popover out of the way once navigated.
+    list.addEventListener("click", function (event) {
+      if (event.target.tagName === "A") setOpen(false);
+    });
+  }
+
   // Highlight the heading nearest the top of the viewport, plus its category.
   if (!("IntersectionObserver" in window)) return;
 

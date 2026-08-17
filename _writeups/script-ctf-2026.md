@@ -278,12 +278,13 @@ TODO
 The password is his name
 
 #### Solution
-We are given an image file of the Harry Potter logo
+
 
 
 ## Web
 
 ### 404 Found (329 Solves, 328 Points)
+TODO
 
 ### wpm-game (194 Solves, 441 Points)
 TODO
