@@ -191,7 +191,7 @@ We gather all conditions, and we have:
 (bVar4 ^ bVar7) == 0x76
 (bVar3 & *(unaff_BP - 10)) == 0x30
 (bVar2 ^ bVar7) == 0x69
-*(BP-0xe) == 'Q' // unaff_BP + -0xe is bVar2 & bVar5, as it gets assigned above
+*(unaff_BP-0xe) == 'Q' // unaff_BP + -0xe is bVar2 & bVar5, as it gets assigned above
 (bVar2 | bVar7) == 0x79
 (bVar7 ^ *(unaff_BP - 10)) == 2
 (bVar1 ^ bVar3) == 0xf
